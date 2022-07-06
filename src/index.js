@@ -24,6 +24,21 @@ function checksExistsUserAccount(request, response, next) {
   return next()
 }
 
+function checkTodoExists(request, response, next) {
+  const { id } = request.params
+  const { user } = request
+
+  const todo = user.todo.find( (todo) => todo.id === id)
+
+  if(!todo){
+    return response.status(404).json({ error: "Todo not exists!"})
+  }
+
+  request.todo = todo
+  
+  return next()
+}
+
 app.post('/users', (request, response) => {
   const { name, username } = request.body
 
@@ -69,40 +84,33 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 
 });
 
-app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
+app.put('/todos/:id', checksExistsUserAccount, checkTodoExists, (request, response) => {
   const { title, deadline } = request.body
-  const { user } = request
-  const { id } = request.params.id
+  const { todo } = request
 
-  if(user.todo.id === id){
-    user.todo.title = title
-    user.todo.deadline = deadline
-  }
-  return response.status(201).send()
-});
+  todo.title = title
+  todo.deadline = new Date(deadline)
+    
+  return response.status(201).send()  
+})
 
-app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  const { user } = request
-  const { id } = request.params
-
-  user.todo.forEach(todo => {
-    if(todo.id === id){
-      user.todo.done = true
-    }
-  });
+app.patch('/todos/:id/done', checksExistsUserAccount, checkTodoExists, (request, response) => {
+  const { todo } = request
+  
+  todo.done = true
 
   return response.status(201).send()
 });
 
-app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  const { user } = request
-  const { id } = request.params
+app.delete('/todos/:id', checksExistsUserAccount, checkTodoExists, (request, response) => {
+  const { todo } = request
+  const { user } = request 
 
-  const newTodoList = user.todo.filter( (todo) => todo.id !== id )
+  const newTodoList = user.todo.filter( (item) => item.id !== todo.id )
 
   user.todo = newTodoList
 
-  return response.status(200).json(user)
+  return response.status(204)
 
 });
 
