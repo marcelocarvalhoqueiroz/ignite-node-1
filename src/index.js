@@ -35,7 +35,7 @@ function checkTodoExists(request, response, next) {
   }
 
   request.todo = todo
-  
+
   return next()
 }
 
@@ -110,7 +110,7 @@ app.delete('/todos/:id', checksExistsUserAccount, checkTodoExists, (request, res
 
   user.todo = newTodoList
 
-  return response.status(204)
+  return response.status(204).send()
 
 });
 
