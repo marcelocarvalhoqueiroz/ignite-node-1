@@ -10,8 +10,6 @@ app.use(express.json());
 
 const users = []
 
-
-// ok
 function checksExistsUserAccount(request, response, next) {
   const { username } = request.headers
 
@@ -26,9 +24,7 @@ function checksExistsUserAccount(request, response, next) {
   return next()
 }
 
-// ok
 app.post('/users', (request, response) => {
-  // Complete aqui
   const { name, username } = request.body
 
   const userAlreadyExists = users.some(
@@ -49,16 +45,12 @@ app.post('/users', (request, response) => {
   return res.status(201).send()
 });
 
-// ok
 app.get('/todos', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
   const { user } = request
   return response.json(user.todo)
 });
 
-// ok
 app.post('/todos', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
   const { title, deadline } = request.body
 
   const { user } = request
@@ -78,15 +70,43 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { title, deadline } = request.body
+  const { user } = request
+  const { id } = request.params
+
+  user.todo.forEach(todo => {
+    if(todo.id === id){
+      user.todo.title = title
+      user.todo.deadline = deadline
+    }
+  });
+
+  return response.status(201).send()
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user } = request
+  const { id } = request.params
+
+  user.todo.forEach(todo => {
+    if(todo.id === id){
+      user.todo.done = true
+    }
+  });
+
+  return response.status(201).send()
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user } = request
+  const { id } = request.params
+
+  const newTodoList = user.todo.filter( (todo) => todo.id !== id )
+
+  user.todo = newTodoList
+
+  return response.status(200).json(user)
+
 });
 
 module.exports = app;
