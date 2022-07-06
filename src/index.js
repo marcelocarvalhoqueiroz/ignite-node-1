@@ -42,7 +42,7 @@ app.post('/users', (request, response) => {
     todo: []
   })
 
-  return res.status(201).send()
+  return response.status(201).send()
 });
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
@@ -74,13 +74,10 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { user } = request
   const { id } = request.params
 
-  user.todo.forEach(todo => {
-    if(todo.id === id){
-      user.todo.title = title
-      user.todo.deadline = deadline
-    }
-  });
-
+  if(user.todo.id === id){
+    user.todo.title = title
+    user.todo.deadline = deadline
+  }
   return response.status(201).send()
 });
 
