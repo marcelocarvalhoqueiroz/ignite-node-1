@@ -72,7 +72,7 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body
   const { user } = request
-  const { id } = request.params
+  const { id } = request.params.id
 
   if(user.todo.id === id){
     user.todo.title = title
